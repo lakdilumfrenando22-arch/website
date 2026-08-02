@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="si" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Sindu Vault - Premium Music Streaming</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-rose-600 to-pink-500 text-white p-2.5 rounded-2xl shadow-lg shadow-rose-500/20 flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-music text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-rose-400 bg-clip-text text-transparent">Sindu Vault</span>
+                    <span class="block text-[10px] text-rose-400 font-medium tracking-widest uppercase">Music & Audio Hub</span>
+                </div>
+            </div>
+
+            <!-- Platform Switcher (Android / iOS) -->
+            <div class="flex items-center bg-slate-900/90 border border-slate-800 p-1 rounded-xl shadow-inner">
+                <button onclick="SinduApp.switchPlatform('android')" id="btn-android" class="platform-tab px-3 sm:px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 active-tab">Android</button>
+                <button onclick="SinduApp.switchPlatform('ios')" id="btn-ios" class="platform-tab px-3 sm:px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all duration-200">iOS</button>
+            </div>
+        </div>
+
+        <!-- Categories Bar Directly Under Navigation -->
+        <div class="bg-slate-900/60 border-t border-slate-800/60 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center space-x-2 overflow-x-auto hide-scroll" id="categoryList">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-28 flex-grow w-full">
+        <section class="max-w-4xl mx-auto space-y-6">
+            
+            <!-- Search & Filter Bar -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search songs, artists..." 
+                        class="w-full bg-slate-900/80 border border-slate-800 rounded-2xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition shadow-inner">
+                </div>
+                <select id="sortSelect" class="bg-slate-900/80 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-rose-500 transition cursor-pointer">
+                    <option value="popular">Most Played</option>
+                    <option value="newest">New Releases</option>
+                </select>
+            </div>
+
+            <!-- Featured Song Banner (Dynamic Content from JS) -->
+            <div class="hero-gradient rounded-3xl p-6 sm:p-8 border border-rose-500/20 relative overflow-hidden shadow-2xl bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-950">
+                <div class="relative z-10 max-w-lg">
+                    <span class="bg-rose-500/20 text-rose-300 text-[11px] font-bold uppercase px-3 py-1 rounded-full border border-rose-500/30 tracking-wider inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-fire text-rose-500"></i> Trending Track
+                    </span>
+                    <!-- මෙහි සින්දුවේ නම සහ කලාකරුවා ඩයිනමික් ලෙස වැටේ -->
+                    <h1 id="featuredTitle" class="text-xl sm:text-3xl font-extrabold mt-3 mb-2 text-white tracking-tight">Loading...</h1>
+                    <p id="featuredArtist" class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">Experience crystal clear high-definition audio streaming optimized for mobile devices.</p>
+                    
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button id="featuredPlayBtn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-lg shadow-rose-600/30 transition flex items-center gap-2">
+                            <i class="fa-solid fa-play text-xs"></i> Play Now
+                        </button>
+                        <button onclick="SinduApp.scrollToPlaylist()" class="bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/80 font-semibold text-xs px-5 py-3 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-list text-slate-400"></i> All Songs
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute right-[-10px] bottom-[-30px] text-8xl sm:text-9xl text-rose-500/10 pointer-events-none">
+                    <i class="fa-solid fa-compact-disc"></i>
+                </div>
+            </div>
+
+            <!-- Song Listing Grid -->
+            <div id="songsSection">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Available Tracks</h3>
+                    <span id="songCountBadge" class="text-xs text-slate-500 font-medium">0 songs</span>
+                </div>
+                <div id="songList" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <!-- Cards injected via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer with Developer Credit -->
+    <footer class="border-t border-slate-900/80 bg-slate-950 py-8 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="text-sm sm:text-base font-medium text-slate-400 tracking-wide">
+                Sindu Vault <span class="text-rose-500 mx-1.5">&copy;</span> 2026 &bull; Developed by <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-500 font-bold text-base sm:text-lg ml-1">Lakdilum</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Music Player Bottom Bar (Fixed Audio Player UI) -->
+    <div id="audioPlayerBar" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 backdrop-blur-lg z-40 p-3 sm:p-4 hidden shadow-2xl">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <div id="playerIcon" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex-shrink-0 flex items-center justify-center text-white text-lg shadow-md">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <div class="truncate">
+                    <h4 id="playerSongName" class="text-xs sm:text-sm font-bold text-white truncate">Song Name</h4>
+                    <p id="playerArtist" class="text-[10px] sm:text-xs text-slate-400 truncate">Artist Name</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 flex-shrink-0">
+                <button onclick="SinduApp.togglePlay()" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-lg shadow-rose-600/30">
+                    <i id="playPauseIcon" class="fa-solid fa-pause text-sm"></i>
+                </button>
+                <button onclick="SinduApp.closePlayer()" class="text-slate-400 hover:text-white text-sm p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript File -->
+    <script src="script.js"></script>
+</body>
+</html>
